@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ImageLoaderService } from '../image-loader.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-image-display',
@@ -8,7 +9,10 @@ import { ImageLoaderService } from '../image-loader.service';
 })
 export class ImageDisplayComponent implements OnInit {
   images: any[];
-  constructor(private imageLoaderService: ImageLoaderService) { }
+  loading: boolean = true;
+  success: boolean = false;
+  constructor(private imageLoaderService: ImageLoaderService,
+    private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.loadImages();
@@ -16,7 +20,16 @@ export class ImageDisplayComponent implements OnInit {
 
   loadImages(): void {
     this.imageLoaderService.getImages().subscribe((data: any) => {
-      this.images = Object.assign({}, data);
+      this.images = data;
+      this.loading = false;
+      this.success = true;
+    }, (error: any) => {
+      this.loading = false;
+      console.log(error);
     });
+  }
+
+  getImagePath(imageBase64: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`data:image/jpg;base64, ${imageBase64}`);
   }
 }

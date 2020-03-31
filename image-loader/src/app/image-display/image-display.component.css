@@ -1,0 +1,12 @@
+.card mat-card {
+  max-width: 400px;
+}
+mat-card {
+  margin: 10px;
+}
+mat-spinner {
+  margin: 0 auto;
+}
+.center {
+  text-align: center;
+}
