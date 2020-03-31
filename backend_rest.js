@@ -12,12 +12,12 @@ var mongoose = require('mongoose');
  var fs = require('fs');
  var nodemailer = require("nodemailer");
  
- const helpers = require('./helpers');
+ //const helpers = require('./helpers');
  
- const criteriaHandler = require('./CriteriaHandler');
+ //const criteriaHandler = require('./CriteriaHandler');
  
  
- const imageService = require('./apiServices');
+ //const imageService = require('./apiServices');
  const Blob = require("cross-blob");
  
 const storage = multer.diskStorage({
@@ -29,9 +29,9 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage : storage});
+const upload = multer({ storage: multer.memoryStorage() });
 
-    var favicon = require('serve-favicon');
+    //var favicon = require('serve-favicon');
     var logger = require('morgan');
     var methodOverride = require('method-override');
     var session = require('express-session');
@@ -66,11 +66,43 @@ var registeruserSchema = mongoose.Schema(
     updatedAt: {type: Date, default: Date.now}
 });
 
-
-
 db.connect(function(err) {
   if (err) throw err;
-  console.log("Connected!");
+  console.log('connected');
+});
+
+app.get('/api',  function (req, res) {
+    var sql = "SELECT * FROM BlobTest";
+    db.query(sql, function (err, result) {
+      if (err) throw err;
+      var results = [];
+      result.forEach(element => {
+        results.push(
+          { 
+            blobId: element.Id,
+            name: element.Name,
+            title: element.Title,
+            description: element.Description,
+            image: element.Value.toString('base64')
+          }
+        );
+      });
+      res.send(results);
+    });
+});
+
+app.post('/api', upload.single('file'), function (req, res) {
+  var sql = "INSERT INTO BlobTest SET ?",
+    values = {
+      name: req.body.name,
+      title: req.body.title,
+      description: req.body.description,
+      value: req.file.buffer
+    };
+  db.query(sql, values, function (err, result) {
+    if (err) throw err;
+    res.send();
+  });
 });
 
 
@@ -128,3 +160,5 @@ app.post('/api/upload', upload.single('img'), function (req, res) {
         })
       }
 });
+
+app.listen(3000);
