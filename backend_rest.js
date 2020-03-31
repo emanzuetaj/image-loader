@@ -8,9 +8,10 @@ let router = express.Router();
 let http = require('http');
 let server = http.Server(app);
 var mongoose = require('mongoose');
- var multer = require('multer');
- var fs = require('fs');
- var nodemailer = require("nodemailer");
+var multer = require('multer');
+var fs = require('fs');
+var nodemailer = require("nodemailer");
+app.use(cors());
  
  //const helpers = require('./helpers');
  
@@ -71,7 +72,7 @@ db.connect(function(err) {
   console.log('connected');
 });
 
-app.get('/api',  function (req, res) {
+app.get('/api', function (req, res) {
     var sql = "SELECT * FROM BlobTest";
     db.query(sql, function (err, result) {
       if (err) throw err;
